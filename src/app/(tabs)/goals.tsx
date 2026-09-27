@@ -4,7 +4,7 @@ import { useWildday } from "@/state/WilddayContext";
 import { colors, radii, spacing, typography } from "@/theme";
 
 export default function GoalsScreen() {
-  const { goals, addGoalWithAction } = useWildday();
+  const { goals, actions, addGoalWithAction } = useWildday();
   const [goal, setGoal] = useState("");
   const [action, setAction] = useState("");
 
@@ -25,7 +25,7 @@ export default function GoalsScreen() {
         <View key={item.id} style={styles.goalCard}>
           <Text style={styles.goalName}>{item.name}</Text>
           <Text style={styles.goalMeta}>{item.actions} repeatable move{item.actions === 1 ? "" : "s"}</Text>
-          <View style={styles.bar}><View style={[styles.fill, { width: Math.min(100, item.progress) + "%" }]} /></View>
+          <Text style={styles.goalProgress}>{actions.filter((action) => action.goalId === item.id).reduce((sum, action) => sum + action.completedCount, 0)} moves completed</Text>
         </View>
       ))}
 
