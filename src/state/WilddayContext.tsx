@@ -176,7 +176,9 @@ export function WilddayProvider({ children }: { children: ReactNode }) {
 
   useEffect(() => {
     if (!ready) return;
-    AsyncStorage.setItem(STORAGE_KEY, JSON.stringify(state)).then(() => setStorageError(null)).catch(() => setStorageError("Wildday could not save your latest change."));
+    let active = true;
+    AsyncStorage.setItem(STORAGE_KEY, JSON.stringify(state)).then(() => { if (active) setStorageError(null); }).catch(() => { if (active) setStorageError("Wildday could not save your latest change."); });
+    return () => { active = false; };
   }, [state, ready]);
 
   const value = useMemo<WilddayContextValue>(() => {
