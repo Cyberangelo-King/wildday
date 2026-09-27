@@ -54,10 +54,9 @@ export default function NotesScreen() {
               <Pressable accessibilityRole="checkbox" accessibilityState={{ checked: note.completed }} onPress={() => toggleNote(note.id)} style={[styles.check, note.completed && styles.checkDone]}>
                 <Text style={styles.checkText}>{note.completed ? "✓" : ""}</Text>
               </Pressable>
-              <Pressable style={styles.noteBody} onLongPress={() => Alert.alert("Note actions", "Choose what you want to do.", [{ text: "Cancel", style: "cancel" }, { text: "Share", onPress: () => shareNote(note.text) }, { text: "Delete", style: "destructive", onPress: () => deleteNote(note.id) }])} onPress={() => shareNote(note.text)}><Text style={[styles.noteText, note.completed && styles.done]}>{note.text}</Text></Pressable>{false && <Pressable style={styles.noteBody} onLongPress={() => Alert.alert("Delete note?", "This cannot be undone.", [{ text: "Cancel", style: "cancel" }, { text: "Delete", style: "destructive", onPress: () => deleteNote(note.id) }])}>
+              <Pressable style={styles.noteBody} onLongPress={() => Alert.alert("Note actions", "Choose what you want to do.", [{ text: "Cancel", style: "cancel" }, { text: "Share", onPress: () => shareNote(note.text) }, { text: "Delete", style: "destructive", onPress: () => deleteNote(note.id) }])} onPress={() => shareNote(note.text)}>
                 <Text style={[styles.noteText, note.completed && styles.done]}>{note.text}</Text>
-              </Pressable>
-            </View>
+              </Pressable>            </View>
           ))}
         </View>
       </ScrollView>
