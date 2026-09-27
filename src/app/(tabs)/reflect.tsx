@@ -5,7 +5,7 @@ import { colors, radii, spacing, typography } from "@/theme";
 import { setDailyReminder, cancelDailyReminder } from "@/services/notifications";
 
 export default function ReflectScreen() {
-  const { focusMinutes, reflection, saveReflection, completedToday, reminderEnabled, reminderHour, reminderMinute, saveReminderSettings } = useWildday();
+  const { weekFocusMinutes, weekCompleted, reflection, saveReflection, reminderEnabled, reminderHour, reminderMinute, saveReminderSettings } = useWildday();
   const [text, setText] = useState(reflection);
   const [reminderOn, setReminderOn] = useState(reminderEnabled);
   const [reminderTime, setReminderTime] = useState(`${String(reminderHour).padStart(2, "0")}:${String(reminderMinute).padStart(2, "0")}`);
@@ -38,8 +38,8 @@ export default function ReflectScreen() {
       <Text style={styles.title}>What did the week teach you?</Text>
       <Text style={styles.body}>No grade. No streak. Just enough honesty to make the next week more workable.</Text>
       <View style={styles.stats}>
-        <View><Text style={styles.stat}>{completedToday}</Text><Text style={styles.label}>moves done</Text></View>
-        <View><Text style={styles.stat}>{focusMinutes}</Text><Text style={styles.label}>focus min</Text></View>
+        <View><Text style={styles.stat}>{weekCompleted}</Text><Text style={styles.label}>moves this week</Text></View>
+        <View><Text style={styles.stat}>{weekFocusMinutes}</Text><Text style={styles.label}>focus minutes</Text></View>
       </View>
       <TextInput multiline value={text} onChangeText={setText} placeholder="What worked? What got in the way? What should change?" placeholderTextColor={colors.muted} style={styles.input} textAlignVertical="top" />
       <View style={styles.reminderCard}>
