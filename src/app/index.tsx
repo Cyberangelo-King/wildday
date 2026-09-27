@@ -5,7 +5,8 @@ import { colors, radii, spacing, typography } from "@/theme";
 
 export default function TodayScreen() {
   const { dueActions, completeAction, rescheduleAction, completedToday, deferredToday } = useWildday();
-  const next = useMemo(() => dueActions.find((item) => !item.history[new Date().toISOString().slice(0, 10)]), [dueActions]);
+  const todayKey = new Date().toLocaleDateString("en-CA");
+  const next = useMemo(() => dueActions.find((item) => !item.history[todayKey]), [dueActions, todayKey]);
   const completed = completedToday;
   const deferred = deferredToday;
 
@@ -31,7 +32,7 @@ export default function TodayScreen() {
       <View style={styles.sectionHeader}><Text style={styles.sectionTitle}>Today</Text><Text style={styles.sectionMeta}>{dueActions.length} moves</Text></View>
 
       {dueActions.map((action) => (
-        <View key={action.id} style={[styles.card, action.history[new Date().toISOString().slice(0, 10)] && styles.quietCard]}>
+        <View key={action.id} style={[styles.card, action.history[todayKey] && styles.quietCard]}>
           <View style={[styles.check, action.history[new Date().toISOString().slice(0, 10)] === "completed" && styles.checkDone]}><Text style={styles.checkText}>{action.history[new Date().toISOString().slice(0, 10)] === "completed" ? "✓" : ""}</Text></View>
           <View style={styles.cardCopy}>
             <Text style={[styles.cardTitle, action.history[new Date().toISOString().slice(0, 10)] === "completed" && styles.completedText]}>{action.title}</Text>
