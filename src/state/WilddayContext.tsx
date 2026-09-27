@@ -32,6 +32,9 @@ type StoredState = {
   focusSessions: number;
   reflection: string;
   reflectionDate: string;
+  reminderEnabled: boolean;
+  reminderHour: number;
+  reminderMinute: number;
 };
 
 type WilddayContextValue = StoredState & {
@@ -48,6 +51,7 @@ type WilddayContextValue = StoredState & {
   rescheduleAction: (id: string) => void;
   recordFocus: (actionId?: string, minutes?: number) => void;
   saveReflection: (text: string) => void;
+  saveReminderSettings: (enabled: boolean, hour: number, minute: number) => void;
 };
 
 const STORAGE_KEY = "wildday.state.v4";
@@ -129,7 +133,10 @@ function migrate(raw: unknown): StoredState {
     focusMinutes: Math.max(0, Number(source.focusMinutes) || 0),
     focusSessions: Math.max(0, Number(source.focusSessions) || 0),
     reflection: typeof source.reflection === "string" ? source.reflection.slice(0, 5000) : "",
-    reflectionDate: typeof source.reflectionDate === "string" ? source.reflectionDate : ""
+    reflectionDate: typeof source.reflectionDate === "string" ? source.reflectionDate : "",
+    reminderEnabled: Boolean(source.reminderEnabled),
+    reminderHour: Math.min(23, Math.max(0, Number(source.reminderHour) || 9)),
+    reminderMinute: Math.min(59, Math.max(0, Number(source.reminderMinute) || 0))
   };
 }
 
@@ -227,6 +234,13 @@ export function WilddayProvider({ children }: { children: ReactNode }) {
 
       saveReflection: (text) => setState((current) => ({
         ...current, reflection: text.trim().slice(0, 5000), reflectionDate: new Date().toISOString()
+      })),
+
+      saveReminderSettings: (enabled, hour, minute) => setState((current) => ({
+        ...current,
+        reminderEnabled: enabled,
+        reminderHour: Math.min(23, Math.max(0, Math.round(hour))),
+        reminderMinute: Math.min(59, Math.max(0, Math.round(minute)))
       }))
     };
   }, [ready, state, todayKey]);
