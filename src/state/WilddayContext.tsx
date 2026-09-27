@@ -10,48 +10,76 @@ export type Action = {
 };
 
 type WilddayContextValue = {
+  ready: boolean;
+  onboarded: boolean;
+  goalName: string;
   actions: Action[];
+  finishOnboarding: (goalName: string, actionTitle: string, duration: number) => void;
   completeAction: (id: string) => void;
   rescheduleAction: (id: string) => void;
 };
 
-const STORAGE_KEY = "wildday.actions.v1";
+const STORAGE_KEY = "wildday.state.v1";
 
-const initialActions: Action[] = [
-  { id: "1", title: "Write for 20 minutes", goal: "Writing", duration: 20, completed: false },
-  { id: "2", title: "Review one technical idea", goal: "Learning", duration: 25, completed: false },
-  { id: "3", title: "Move for 15 minutes", goal: "Body", duration: 15, completed: true }
-];
+const initialState = {
+  onboarded: false,
+  goalName: "",
+  actions: [] as Action[]
+};
 
 const WilddayContext = createContext<WilddayContextValue | null>(null);
 
 export function WilddayProvider({ children }: { children: ReactNode }) {
-  const [actions, setActions] = useState(initialActions);
+  const [state, setState] = useState(initialState);
+  const [ready, setReady] = useState(false);
 
   useEffect(() => {
     AsyncStorage.getItem(STORAGE_KEY)
-      .then((value) => { if (value) setActions(JSON.parse(value)); })
-      .catch(() => {});
+      .then((value) => {
+        if (value) setState(JSON.parse(value));
+      })
+      .catch(() => {})
+      .finally(() => setReady(true));
   }, []);
 
   useEffect(() => {
-    AsyncStorage.setItem(STORAGE_KEY, JSON.stringify(actions)).catch(() => {});
-  }, [actions]);
+    if (ready) AsyncStorage.setItem(STORAGE_KEY, JSON.stringify(state)).catch(() => {});
+  }, [state, ready]);
 
   const value = useMemo<WilddayContextValue>(() => ({
-    actions,
-    completeAction: (id) => setActions((current) =>
-      current.map((action) => action.id === id ? { ...action, completed: true } : action)
-    ),
-    rescheduleAction: (id) => setActions((current) => {
-      const target = current.find((action) => action.id === id);
+    ready,
+    onboarded: state.onboarded,
+    goalName: state.goalName,
+    actions: state.actions,
+    finishOnboarding: (goalName, actionTitle, duration) => setState({
+      onboarded: true,
+      goalName,
+      actions: [{
+        id: String(Date.now()),
+        title: actionTitle,
+        goal: goalName,
+        duration,
+        completed: false
+      }]
+    }),
+    completeAction: (id) => setState((current) => ({
+      ...current,
+      actions: current.actions.map((action) =>
+        action.id === id ? { ...action, completed: true } : action
+      )
+    })),
+    rescheduleAction: (id) => setState((current) => {
+      const target = current.actions.find((action) => action.id === id);
       if (!target) return current;
-      return [
-        ...current.filter((action) => action.id !== id),
-        { ...target, completed: false }
-      ];
+      return {
+        ...current,
+        actions: [
+          ...current.actions.filter((action) => action.id !== id),
+          { ...target, completed: false }
+        ]
+      };
     })
-  }), [actions]);
+  }), [ready, state]);
 
   return <WilddayContext.Provider value={value}>{children}</WilddayContext.Provider>;
 }
