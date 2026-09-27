@@ -13,3 +13,10 @@
 The first data model was too flat: an action could only be completed or not completed. That is insufficient for a product designed around real life. I introduced cadence, deferred state, completion counts, focus sessions, and reflection timestamps. The intent is to distinguish “I did it,” “I moved it,” and “it did not happen” rather than collapsing all three into failure.
 
 I also corrected the focus experience so a completed focus block actually transitions into a break instead of merely displaying the idea of one.
+
+
+## 2026-09-28 — Production baseline
+
+I stopped treating dependency versions as incidental. Expo SDK 57 is now paired with its SDK-aligned React Native and React baseline, Router and Notifications are on the SDK 57 line, and web dependencies are explicit. I also added Expo Doctor to CI. The first CI failure was not application code: setup-node required a lockfile because the workflow enabled npm caching. I removed that false requirement rather than hiding it with a generated artifact I could not validate.
+
+Notifications remain local-only and opt-in. The app does not request notification permission during onboarding, does not collect push tokens, and does not send personal goals to a server.
