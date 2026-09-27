@@ -29,4 +29,6 @@ Start with a today view, a small set of goals and repeatable actions, a focus ti
 
 The repository now contains the first mobile foundation: Expo + React Native + TypeScript, file-based routing, local persistence, and a first-day onboarding flow leading into Today.
 
-The visual system is intentionally provisional until the product direction is chosen. The implementation keeps the theme tokens isolated so the interface can be reshaped without rewriting the product logic.
+The visual system is intentionally restrained: warm paper, deep ink, an acid-lime action signal, oversized type, generous spacing, and low visual noise. Theme tokens remain isolated so the interface can evolve without rewriting product logic.
+
+The branch is still pre-release. TypeScript CI, real-device validation, accessibility review, persistence recovery, and notification behaviour are release gates.
