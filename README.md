@@ -27,4 +27,6 @@ Start with a today view, a small set of goals and repeatable actions, a focus ti
 
 ## Status
 
-This repository is at product-foundation stage. The next milestone is choosing a visual direction and translating the brief into the first mobile experience.
+The repository now contains the first mobile foundation: Expo + React Native + TypeScript, file-based routing, local persistence, and a first-day onboarding flow leading into Today.
+
+The visual system is intentionally provisional until the product direction is chosen. The implementation keeps the theme tokens isolated so the interface can be reshaped without rewriting the product logic.
