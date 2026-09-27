@@ -33,8 +33,8 @@ export default function NotesScreen() {
           const goalButtons = goals.slice(0, 4).map((goal) => ({
             text: goal.name,
             onPress: () => {
-              const promoted = promoteNoteToAction(noteId, goal.id, 20);
-              if (promoted) setShareMessage("Moved to your actions.");
+              promoteNoteToAction(noteId, goal.id, 20);
+              setShareMessage("Moved to your actions.");
             }
           }));
           Alert.alert("Make it actionable", "Which goal should carry this?", [...goalButtons, { text: "Cancel", style: "cancel" }]);
