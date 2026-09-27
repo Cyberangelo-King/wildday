@@ -33,12 +33,12 @@ export default function TodayScreen() {
 
       {dueActions.map((action) => (
         <View key={action.id} style={[styles.card, action.history[todayKey] && styles.quietCard]}>
-          <View style={[styles.check, action.history[new Date().toISOString().slice(0, 10)] === "completed" && styles.checkDone]}><Text style={styles.checkText}>{action.history[new Date().toISOString().slice(0, 10)] === "completed" ? "✓" : ""}</Text></View>
+          <View style={[styles.check, action.history[todayKey] === "completed" && styles.checkDone]}><Text style={styles.checkText}>{action.history[todayKey] === "completed" ? "✓" : ""}</Text></View>
           <View style={styles.cardCopy}>
-            <Text style={[styles.cardTitle, action.history[new Date().toISOString().slice(0, 10)] === "completed" && styles.completedText]}>{action.title}</Text>
+            <Text style={[styles.cardTitle, action.history[todayKey] === "completed" && styles.completedText]}>{action.title}</Text>
             <Text style={styles.cardMeta}>{action.goal} · {action.duration} min · {action.cadence}</Text>
           </View>
-          {action.history[new Date().toISOString().slice(0, 10)] === "deferred" ? <Text style={styles.later}>LATER</Text> : null}
+          {action.history[todayKey] === "deferred" ? <Text style={styles.later}>LATER</Text> : null}
         </View>
       ))}
 
