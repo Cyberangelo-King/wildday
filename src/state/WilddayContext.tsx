@@ -61,7 +61,7 @@ const STORAGE_KEY = "wildday.state.v5";
 const LEGACY_STORAGE_KEY = "wildday.state.v4";
 
 const initialState: StoredState = {
-  version: 4, onboarded: false, goalName: "", goals: [], actions: [],
+  version: 5, onboarded: false, goalName: "", goals: [], actions: [],
   focusMinutes: 0, focusHistory: {}, focusSessions: 0, reflection: "", reflectionDate: "", reminderEnabled: false, reminderHour: 9, reminderMinute: 0
 };
 
