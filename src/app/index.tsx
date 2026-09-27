@@ -4,16 +4,16 @@ import { useWildday } from "@/state/WilddayContext";
 import { colors, radii, spacing, typography } from "@/theme";
 
 export default function TodayScreen() {
-  const { actions, completeAction, rescheduleAction } = useWildday();
-  const next = useMemo(() => actions.find((item) => !item.completed && !item.deferred), [actions]);
-  const completed = actions.filter((item) => item.completed).length;
-  const deferred = actions.filter((item) => item.deferred).length;
+  const { dueActions, completeAction, rescheduleAction, completedToday, deferredToday } = useWildday();
+  const next = useMemo(() => dueActions.find((item) => !item.history[new Date().toISOString().slice(0, 10)]), [dueActions]);
+  const completed = completedToday;
+  const deferred = deferredToday;
 
   return (
     <ScrollView contentContainerStyle={styles.content}>
       <View style={styles.header}>
         <View><Text style={styles.eyebrow}>TODAY</Text><Text style={styles.title}>Make today count.</Text></View>
-        <View style={styles.progressPill}><Text style={styles.progressText}>{completed}/{actions.length}</Text></View>
+        <View style={styles.progressPill}><Text style={styles.progressText}>{completed}/{dueActions.length}</Text></View>
       </View>
 
       <View style={styles.hero}>
@@ -28,16 +28,16 @@ export default function TodayScreen() {
         </View> : null}
       </View>
 
-      <View style={styles.sectionHeader}><Text style={styles.sectionTitle}>Today</Text><Text style={styles.sectionMeta}>{actions.length} moves</Text></View>
+      <View style={styles.sectionHeader}><Text style={styles.sectionTitle}>Today</Text><Text style={styles.sectionMeta}>{dueActions.length} moves</Text></View>
 
-      {actions.map((action) => (
-        <View key={action.id} style={[styles.card, (action.completed || action.deferred) && styles.quietCard]}>
-          <View style={[styles.check, action.completed && styles.checkDone]}><Text style={styles.checkText}>{action.completed ? "✓" : ""}</Text></View>
+      {dueActions.map((action) => (
+        <View key={action.id} style={[styles.card, action.history[new Date().toISOString().slice(0, 10)] && styles.quietCard]}>
+          <View style={[styles.check, action.history[new Date().toISOString().slice(0, 10)] === "completed" && styles.checkDone]}><Text style={styles.checkText}>{action.history[new Date().toISOString().slice(0, 10)] === "completed" ? "✓" : ""}</Text></View>
           <View style={styles.cardCopy}>
-            <Text style={[styles.cardTitle, action.completed && styles.completedText]}>{action.title}</Text>
+            <Text style={[styles.cardTitle, action.history[new Date().toISOString().slice(0, 10)] === "completed" && styles.completedText]}>{action.title}</Text>
             <Text style={styles.cardMeta}>{action.goal} · {action.duration} min · {action.cadence}</Text>
           </View>
-          {action.deferred ? <Text style={styles.later}>LATER</Text> : null}
+          {action.history[new Date().toISOString().slice(0, 10)] === "deferred" ? <Text style={styles.later}>LATER</Text> : null}
         </View>
       ))}
 
