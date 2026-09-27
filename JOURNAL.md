@@ -20,3 +20,12 @@ I also corrected the focus experience so a completed focus block actually transi
 I stopped treating dependency versions as incidental. Expo SDK 57 is now paired with its SDK-aligned React Native and React baseline, Router and Notifications are on the SDK 57 line, and web dependencies are explicit. I also added Expo Doctor to CI. The first CI failure was not application code: setup-node required a lockfile because the workflow enabled npm caching. I removed that false requirement rather than hiding it with a generated artifact I could not validate.
 
 Notifications remain local-only and opt-in. The app does not request notification permission during onboarding, does not collect push tokens, and does not send personal goals to a server.
+
+
+## 2026-09-28 — Capture, sharing, and failure recovery
+
+I added a fast mental-note surface because not every thought deserves to become a goal. Notes are capped, persisted locally, completable, deletable, and explicitly shareable. Sharing uses the operating system share sheet and is always initiated by the user.
+
+Reflection now supports selective sharing of either weekly evidence or the written reflection. Wildday does not publish anything automatically.
+
+I also stopped swallowing persistence errors. If local storage cannot be opened or saved, the app surfaces a recovery state instead of pretending the write succeeded. This is deliberately conservative: the app never claims data is saved when the persistence layer rejected it.
