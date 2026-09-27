@@ -3,6 +3,7 @@ import { Pressable, StyleSheet, Switch, Text, TextInput, View } from "react-nati
 import { useWildday } from "@/state/WilddayContext";
 import { colors, radii, spacing, typography } from "@/theme";
 import { setDailyReminder, cancelDailyReminder } from "@/services/notifications";
+import { shareWildday } from "@/services/share";
 
 export default function ReflectScreen() {
   const { weekFocusMinutes, weekCompleted, reflection, saveReflection, reminderEnabled, reminderHour, reminderMinute, saveReminderSettings } = useWildday();
@@ -10,6 +11,12 @@ export default function ReflectScreen() {
   const [reminderOn, setReminderOn] = useState(reminderEnabled);
   const [reminderTime, setReminderTime] = useState(`${String(reminderHour).padStart(2, "0")}:${String(reminderMinute).padStart(2, "0")}`);
   const [reminderMessage, setReminderMessage] = useState("");
+  const [shareMessage, setShareMessage] = useState("");
+
+  async function shareWeek() {
+    const result = await shareWildday({ title: "My Wildday", message: `This week: ${weekCompleted} moves completed. ${weekFocusMinutes} minutes of focus.` });
+    setShareMessage(result.ok ? "Ready to share." : "Sharing was cancelled or unavailable.");
+  }
 
   async function toggleReminder(value: boolean) {
     setReminderMessage("");
@@ -42,6 +49,7 @@ export default function ReflectScreen() {
         <View><Text style={styles.stat}>{weekFocusMinutes}</Text><Text style={styles.label}>focus minutes</Text></View>
       </View>
       <TextInput multiline value={text} onChangeText={setText} placeholder="What worked? What got in the way? What should change?" placeholderTextColor={colors.muted} style={styles.input} textAlignVertical="top" />
+      <Pressable accessibilityRole="button" onPress={shareWeek} style={styles.shareButton}><Text style={styles.shareText}>Share this week</Text></Pressable>{shareMessage ? <Text style={styles.reminderMessage}>{shareMessage}</Text> : null}
       <View style={styles.reminderCard}>
         <View style={styles.reminderHeader}><View style={styles.reminderCopy}><Text style={styles.reminderTitle}>A gentle reminder</Text><Text style={styles.reminderBody}>One local notification. You choose when.</Text></View><Switch accessibilityLabel="Daily Wildday reminder" value={reminderOn} onValueChange={toggleReminder} trackColor={{ false: colors.line, true: colors.accent }} thumbColor={colors.ink} /></View>
         {reminderOn ? <View style={styles.timeRow}><Text style={styles.timeLabel}>Daily at</Text><TextInput accessibilityLabel="Reminder time" value={reminderTime} onChangeText={setReminderTime} onBlur={() => toggleReminder(true)} keyboardType="numbers-and-punctuation" style={styles.timeInput} maxLength={5} placeholder="09:00" placeholderTextColor={colors.muted} /></View> : null}
@@ -59,5 +67,5 @@ const styles=StyleSheet.create({
   eyebrow:{...typography.eyebrow,color:colors.muted},title:{...typography.title,color:colors.text},body:{...typography.body,color:colors.muted},
   stats:{flexDirection:"row",gap:12,marginVertical:spacing.md},stat:{fontSize:28,fontWeight:"800",color:colors.text},label:{...typography.small,color:colors.muted},
   input:{flex:1,minHeight:180,backgroundColor:colors.surface,borderWidth:1,borderColor:colors.line,borderRadius:radii.lg,padding:16,color:colors.text,fontSize:16,lineHeight:24},
-  reminderCard:{backgroundColor:colors.surface,borderWidth:1,borderColor:colors.line,borderRadius:radii.lg,padding:spacing.md,gap:12},reminderHeader:{flexDirection:"row",alignItems:"center",gap:12},reminderCopy:{flex:1},reminderTitle:{...typography.body,color:colors.text,fontWeight:"800"},reminderBody:{...typography.small,color:colors.muted,marginTop:3},timeRow:{flexDirection:"row",alignItems:"center",justifyContent:"space-between"},timeLabel:{...typography.small,color:colors.muted},timeInput:{borderWidth:1,borderColor:colors.line,borderRadius:radii.md,paddingHorizontal:12,paddingVertical:8,color:colors.text,fontWeight:"800",fontSize:16,width:88,textAlign:"center"},reminderMessage:{...typography.small,color:colors.muted},button:{backgroundColor:colors.ink,borderRadius:radii.md,padding:16,alignItems:"center"},buttonText:{color:colors.paper,fontWeight:"800",fontSize:16}
+  shareButton:{backgroundColor:colors.ink,borderRadius:radii.md,padding:16,alignItems:"center"},shareText:{color:colors.paper,fontWeight:"800",fontSize:16},reminderCard:{backgroundColor:colors.surface,borderWidth:1,borderColor:colors.line,borderRadius:radii.lg,padding:spacing.md,gap:12},reminderHeader:{flexDirection:"row",alignItems:"center",gap:12},reminderCopy:{flex:1},reminderTitle:{...typography.body,color:colors.text,fontWeight:"800"},reminderBody:{...typography.small,color:colors.muted,marginTop:3},timeRow:{flexDirection:"row",alignItems:"center",justifyContent:"space-between"},timeLabel:{...typography.small,color:colors.muted},timeInput:{borderWidth:1,borderColor:colors.line,borderRadius:radii.md,paddingHorizontal:12,paddingVertical:8,color:colors.text,fontWeight:"800",fontSize:16,width:88,textAlign:"center"},reminderMessage:{...typography.small,color:colors.muted},button:{backgroundColor:colors.ink,borderRadius:radii.md,padding:16,alignItems:"center"},buttonText:{color:colors.paper,fontWeight:"800",fontSize:16}
 });
