@@ -44,7 +44,7 @@ export default function GoalsScreen() {
 const styles = StyleSheet.create({
   content:{padding:spacing.lg,paddingTop:64,gap:spacing.md,backgroundColor:colors.background,minHeight:"100%"},
   eyebrow:{...typography.eyebrow,color:colors.muted},title:{...typography.title,color:colors.text},intro:{...typography.body,color:colors.muted,marginBottom:spacing.md},
-  goalCard:{backgroundColor:colors.ink,borderRadius:radii.lg,padding:spacing.lg,gap:8},goalName:{...typography.section,color:colors.paper},goalMeta:{...typography.small,color:colors.mutedOnInk},
+  goalCard:{backgroundColor:colors.ink,borderRadius:radii.lg,padding:spacing.lg,gap:8},goalName:{...typography.section,color:colors.paper},goalMeta:{...typography.small,color:colors.mutedOnInk},goalProgress:{...typography.small,color:colors.accent,marginTop:6},
   bar:{height:5,backgroundColor:colors.lineOnInk,borderRadius:5,overflow:"hidden",marginTop:8},fill:{height:"100%",backgroundColor:colors.accent},
   addCard:{backgroundColor:colors.surface,borderWidth:1,borderColor:colors.line,borderRadius:radii.lg,padding:spacing.md,gap:10,marginTop:spacing.sm},cardTitle:{...typography.section,color:colors.text},
   input:{borderWidth:1,borderColor:colors.line,borderRadius:radii.md,padding:14,color:colors.text,fontSize:15},button:{backgroundColor:colors.ink,borderRadius:radii.md,padding:15,alignItems:"center"},buttonText:{color:colors.paper,fontWeight:"800"}
