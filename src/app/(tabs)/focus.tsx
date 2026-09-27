@@ -16,14 +16,19 @@ export default function FocusScreen() {
         if (current <= 1) {
           clearInterval(timer);
           setRunning(false);
-          if (phase === "work") recordFocus(nextAction?.id, nextAction?.duration);
-          return 0;
+          if (phase === "work") {
+            recordFocus(nextAction?.id, nextAction?.duration);
+            setPhase("break");
+            return 5 * 60;
+          }
+          setPhase("work");
+          return (nextAction?.duration ?? 20) * 60;
         }
         return current - 1;
       });
     }, 1000);
     return () => clearInterval(timer);
-  }, [running, nextAction?.id, recordFocus]);
+  }, [running, nextAction?.id, nextAction?.duration, phase, recordFocus]);
 
   useEffect(() => {
     setSeconds((nextAction?.duration ?? 20) * 60);
@@ -42,9 +47,9 @@ export default function FocusScreen() {
       <View style={styles.clock}><Text style={styles.clockText}>{minutes}:{secs}</Text></View>
       <Text style={styles.hint}>{running ? "One thing. Nothing else." : "Your attention is worth protecting."}</Text>
       <Pressable onPress={() => setRunning((value) => !value)} style={styles.button}>
-        <Text style={styles.buttonText}>{running ? "Pause" : seconds === 0 ? "Start again" : "Start focus"}</Text>
+        <Text style={styles.buttonText}>{running ? "Pause" : "Start " + (phase === "work" ? "focus" : "break")}</Text>
       </Pressable>
-      <Pressable onPress={() => { setRunning(false); setSeconds((nextAction?.duration ?? 20) * 60); }} style={styles.reset}>
+      <Pressable onPress={() => { setRunning(false); setSeconds((phase === "work" ? (nextAction?.duration ?? 20) : 5) * 60); }} style={styles.reset}>
         <Text style={styles.resetText}>Reset</Text>
       </Pressable>
     </View>
