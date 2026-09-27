@@ -48,7 +48,7 @@ type WilddayContextValue = StoredState & {
   finishOnboarding: (goalName: string, actionTitle: string, duration: number, cadence?: Cadence) => void;
   addGoalWithAction: (goalName: string, title: string, duration: number, cadence?: Cadence) => void;
   addAction: (input: { goalId: string; title: string; duration: number; cadence?: Cadence }) => void;
-  promoteNoteToAction: (noteId: string, goalId: string, duration?: number) => boolean;
+  promoteNoteToAction: (noteId: string, goalId: string, duration?: number) => void;
   completeAction: (id: string) => void;
   rescheduleAction: (id: string) => void;
   recordFocus: (actionId?: string, minutes?: number) => void;
@@ -263,14 +263,11 @@ export function WilddayProvider({ children }: { children: ReactNode }) {
         };
       }),
 
-      promoteNoteToAction: (noteId, goalId, duration = 20) => {
-        let promoted = false;
-        setState((current) => {
-          const note = current.notes.find((item) => item.id === noteId);
-          const goal = current.goals.find((item) => item.id === goalId);
-          if (!note || !goal || !note.text.trim()) return current;
-          promoted = true;
-          const action: Action = {
+      promoteNoteToAction: (noteId, goalId, duration = 20) => setState((current) => {
+        const note = current.notes.find((item) => item.id === noteId);
+        const goal = current.goals.find((item) => item.id === goalId);
+        if (!note || !goal || !note.text.trim()) return current;
+        const action: Action = {
             id: makeId("action"),
             title: note.text.trim().slice(0, 200),
             goalId,
@@ -281,15 +278,13 @@ export function WilddayProvider({ children }: { children: ReactNode }) {
             history: {},
             completedCount: 0
           };
-          return {
-            ...current,
-            actions: [...current.actions, action],
-            goals: current.goals.map((item) => item.id === goalId ? { ...item, actions: item.actions + 1 } : item),
-            notes: current.notes.filter((item) => item.id !== noteId)
-          };
-        });
-        return promoted;
-      },
+        return {
+          ...current,
+          actions: [...current.actions, action],
+          goals: current.goals.map((item) => item.id === goalId ? { ...item, actions: item.actions + 1 } : item),
+          notes: current.notes.filter((item) => item.id !== noteId)
+        };
+      }),
 
       completeAction: (id) => setState((current) => {
         const target = current.actions.find((item) => item.id === id);
