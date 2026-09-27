@@ -16,3 +16,4 @@ jobs:
       - run: npm install
       - run: npx expo-doctor
       - run: npm run typecheck
+      - run: npx expo config --type public
