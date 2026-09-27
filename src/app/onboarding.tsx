@@ -16,7 +16,7 @@ export default function OnboardingScreen() {
 
   function begin() {
     if (!canContinue) return;
-    finishOnboarding(goal.trim(), action.trim(), Math.max(5, Number(duration) || 20));
+    finishOnboarding(goal.trim(), action.trim(), Math.max(5, Number(duration) || 20), cadence);
     router.replace("/");
   }
 
