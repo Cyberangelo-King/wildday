@@ -7,9 +7,20 @@
     "scheme": "wildday",
     "userInterfaceStyle": "automatic",
     "newArchEnabled": true,
-    "experiments": { "typedRoutes": true },
-    "ios": { "supportsTablet": true },
+    "experiments": {
+      "typedRoutes": true
+    },
+    "ios": {
+      "supportsTablet": true
+    },
     "android": {},
-    "web": { "bundler": "metro", "output": "static" }
+    "web": {
+      "bundler": "metro",
+      "output": "static"
+    },
+    "plugins": [
+      "expo-router",
+      "expo-notifications"
+    ]
   }
 }
