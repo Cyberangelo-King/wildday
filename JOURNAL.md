@@ -7,3 +7,9 @@
 - Added lightweight reflection using completion and focus signals without converting them into a single productivity score.
 - Added a GitHub quality workflow for TypeScript checking on pushes and pull requests.
 - Design direction is now intentionally opinionated: warm paper, deep ink, acid-lime action signal, large typography, generous spacing, and low visual noise. The system is designed to feel like an instrument rather than a spreadsheet.
+
+## 2026-09-28 — Recurrence and recovery
+
+The first data model was too flat: an action could only be completed or not completed. That is insufficient for a product designed around real life. I introduced cadence, deferred state, completion counts, focus sessions, and reflection timestamps. The intent is to distinguish “I did it,” “I moved it,” and “it did not happen” rather than collapsing all three into failure.
+
+I also corrected the focus experience so a completed focus block actually transitions into a break instead of merely displaying the idea of one.
