@@ -41,7 +41,7 @@ type WilddayContextValue = StoredState & {
   completedToday: number;
   deferredToday: number;
   dueActions: Action[];
-  finishOnboarding: (goalName: string, actionTitle: string, duration: number) => void;
+  finishOnboarding: (goalName: string, actionTitle: string, duration: number, cadence?: Cadence) => void;
   addGoalWithAction: (goalName: string, title: string, duration: number, cadence?: Cadence) => void;
   addAction: (input: { goalId: string; title: string; duration: number; cadence?: Cadence }) => void;
   completeAction: (id: string) => void;
@@ -157,11 +157,11 @@ export function WilddayProvider({ children }: { children: ReactNode }) {
     return {
       ...state, ready, todayKey, dueActions, nextAction, completedToday, deferredToday,
 
-      finishOnboarding: (goalName, actionTitle, duration) => {
+      finishOnboarding: (goalName, actionTitle, duration, cadence = "daily") => {
         const goalId = String(Date.now());
         const action: Action = {
           id: goalId + "-action", title: actionTitle.trim().slice(0, 200), goalId, goal: goalName.trim().slice(0, 120),
-          duration: safeDuration(duration), cadence: "daily", anchorWeekday: weekday(),
+          duration: safeDuration(duration), cadence, anchorWeekday: weekday(),
           history: {}, completedCount: 0
         };
         setState({
