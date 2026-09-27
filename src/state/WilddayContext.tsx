@@ -23,7 +23,7 @@ export type Goal = {
 };
 
 type StoredState = {
-  version: 4;
+  version: 5;
   onboarded: boolean;
   goalName: string;
   goals: Goal[];
@@ -57,7 +57,8 @@ type WilddayContextValue = StoredState & {
   saveReminderSettings: (enabled: boolean, hour: number, minute: number) => void;
 };
 
-const STORAGE_KEY = "wildday.state.v4";
+const STORAGE_KEY = "wildday.state.v5";
+const LEGACY_STORAGE_KEY = "wildday.state.v4";
 
 const initialState: StoredState = {
   version: 4, onboarded: false, goalName: "", goals: [], actions: [],
@@ -128,7 +129,7 @@ function migrate(raw: unknown): StoredState {
     : [];
 
   return {
-    version: 4,
+    version: 5,
     onboarded: Boolean(source.onboarded),
     goalName: typeof source.goalName === "string" ? source.goalName : "",
     goals,
@@ -153,7 +154,12 @@ export function WilddayProvider({ children }: { children: ReactNode }) {
 
   useEffect(() => {
     AsyncStorage.getItem(STORAGE_KEY)
-      .then((value) => setState(value ? migrate(JSON.parse(value)) : initialState))
+      .then(async (value) => {
+        if (value) return setState(migrate(JSON.parse(value)));
+        const legacy = await AsyncStorage.getItem(LEGACY_STORAGE_KEY);
+        if (legacy) return setState(migrate(JSON.parse(legacy)));
+        setState(initialState);
+      })
       .catch(() => setState(initialState))
       .finally(() => setReady(true));
   }, []);
@@ -186,7 +192,7 @@ export function WilddayProvider({ children }: { children: ReactNode }) {
           history: {}, completedCount: 0
         };
         setState({
-          ...initialState, version: 4, onboarded: true, goalName: goalName.trim().slice(0, 120),
+          ...initialState, version: 5, onboarded: true, goalName: goalName.trim().slice(0, 120),
           goals: [{ id: goalId, name: goalName.trim().slice(0, 120), actions: 1 }], actions: [action]
         });
       },
