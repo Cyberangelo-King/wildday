@@ -7,6 +7,7 @@ export default function FocusScreen() {
   const { nextAction, recordFocus } = useWildday();
   const [seconds, setSeconds] = useState((nextAction?.duration ?? 20) * 60);
   const [running, setRunning] = useState(false);
+  const [phase, setPhase] = useState<"work" | "break">("work");
 
   useEffect(() => {
     if (!running) return;
@@ -15,7 +16,7 @@ export default function FocusScreen() {
         if (current <= 1) {
           clearInterval(timer);
           setRunning(false);
-          recordFocus(nextAction?.id);
+          if (phase === "work") recordFocus(nextAction?.id, nextAction?.duration);
           return 0;
         }
         return current - 1;
@@ -27,6 +28,7 @@ export default function FocusScreen() {
   useEffect(() => {
     setSeconds((nextAction?.duration ?? 20) * 60);
     setRunning(false);
+    setPhase("work");
   }, [nextAction?.id, nextAction?.duration]);
 
   const minutes = Math.floor(seconds / 60).toString().padStart(2, "0");
@@ -34,9 +36,9 @@ export default function FocusScreen() {
 
   return (
     <View style={styles.screen}>
-      <Text style={styles.eyebrow}>FOCUS</Text>
+      <Text style={styles.eyebrow}>{phase === "work" ? "FOCUS" : "BREAK"}</Text>
       <Text style={styles.title}>Stay here.</Text>
-      <Text style={styles.action}>{nextAction?.title ?? "Choose a next move first."}</Text>
+      <Text style={styles.action}>{phase === "work" ? (nextAction?.title ?? "Choose a next move first.") : "Step away. Let your attention reset."}</Text>
       <View style={styles.clock}><Text style={styles.clockText}>{minutes}:{secs}</Text></View>
       <Text style={styles.hint}>{running ? "One thing. Nothing else." : "Your attention is worth protecting."}</Text>
       <Pressable onPress={() => setRunning((value) => !value)} style={styles.button}>
