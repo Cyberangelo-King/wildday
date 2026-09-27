@@ -27,7 +27,7 @@ Start with a today view, a small set of goals and repeatable actions, a focus ti
 
 ## Status
 
-The repository now contains the first mobile foundation: Expo + React Native + TypeScript, file-based routing, local persistence, and a first-day onboarding flow leading into Today.
+The repository now contains the first resilient mobile foundation: Expo + React Native + TypeScript, file-based routing, versioned local persistence, date-aware recurring actions, focus cycles, reflections, and opt-in local reminders.
 
 The visual system is intentionally restrained: warm paper, deep ink, an acid-lime action signal, oversized type, generous spacing, and low visual noise. Theme tokens remain isolated so the interface can evolve without rewriting product logic.
 
