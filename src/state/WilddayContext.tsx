@@ -57,7 +57,7 @@ const initialState: StoredState = {
   focusMinutes: 0, focusSessions: 0, reflection: "", reflectionDate: ""
 };
 
-function dayKey(date = new Date()) {
+export function getLocalDayKey(date = new Date()) {
   const year = date.getFullYear();
   const month = String(date.getMonth() + 1).padStart(2, "0");
   const day = String(date.getDate()).padStart(2, "0");
@@ -83,7 +83,7 @@ function migrate(raw: unknown): StoredState {
   if (!raw || typeof raw !== "object") return initialState;
   const source = raw as Partial<StoredState> & { actions?: Array<Record<string, unknown>>; goals?: Array<Record<string, unknown>> };
   const now = new Date();
-  const today = dayKey(now);
+  const today = getLocalDayKey(now);
 
   const actions: Action[] = Array.isArray(source.actions)
     ? source.actions
@@ -138,7 +138,7 @@ const WilddayContext = createContext<WilddayContextValue | null>(null);
 export function WilddayProvider({ children }: { children: ReactNode }) {
   const [state, setState] = useState<StoredState>(initialState);
   const [ready, setReady] = useState(false);
-  const todayKey = dayKey();
+  const todayKey = getLocalDayKey();
 
   useEffect(() => {
     AsyncStorage.getItem(STORAGE_KEY)
