@@ -1,12 +1,18 @@
-import { Stack } from "expo-router";
+import { Redirect, Stack } from "expo-router";
 import { StatusBar } from "expo-status-bar";
-import { WilddayProvider } from "@/state/WilddayContext";
+import { useWildday } from "@/state/WilddayContext";
+
+function NavigationGate() {
+  const { ready, onboarded } = useWildday();
+  if (!ready) return null;
+  return onboarded ? <Stack screenOptions={{ headerShown: false }} /> : <Redirect href="/onboarding" />;
+}
 
 export default function RootLayout() {
   return (
-    <WilddayProvider>
+    <>
       <StatusBar style="auto" />
-      <Stack screenOptions={{ headerShown: false }} />
-    </WilddayProvider>
+      <NavigationGate />
+    </>
   );
 }
