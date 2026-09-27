@@ -18,7 +18,8 @@ if (Platform.OS !== "web") {
 export async function setDailyReminder(enabled: boolean, hour: number, minute: number) {
   if (Platform.OS === "web") return { enabled: false, reason: "unsupported" as const };
 
-  const existing = await Notifications.getAllScheduledNotificationsAsync();
+  let existing: Notifications.NotificationRequest[] = [];
+  try { existing = await Notifications.getAllScheduledNotificationsAsync(); } catch { return { enabled: false as const, reason: "unavailable" as const }; }
   const current = existing.find((item) => item.identifier === REMINDER_ID);
   if (current) await Notifications.cancelScheduledNotificationAsync(current.identifier);
 
@@ -41,6 +42,7 @@ export async function setDailyReminder(enabled: boolean, hour: number, minute: n
     });
   }
 
+  try {
   await Notifications.scheduleNotificationAsync({
     identifier: REMINDER_ID,
     content: {
@@ -55,6 +57,9 @@ export async function setDailyReminder(enabled: boolean, hour: number, minute: n
       minute: Math.min(59, Math.max(0, Math.round(minute))),
     },
   });
+  } catch {
+    return { enabled: false as const, reason: "unavailable" as const };
+  }
 
   return { enabled: true as const };
 }
