@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { Pressable, StyleSheet, Text, TextInput, View } from "react-native";
 import { useRouter } from "expo-router";
-import { useWildday } from "@/state/WilddayContext";
+import { Cadence, useWildday } from "@/state/WilddayContext";
 import { colors, radii, spacing, typography } from "@/theme";
 
 export default function OnboardingScreen() {
@@ -10,6 +10,7 @@ export default function OnboardingScreen() {
   const [goal, setGoal] = useState("");
   const [action, setAction] = useState("");
   const [duration, setDuration] = useState("20");
+  const [cadence, setCadence] = useState<Cadence>("daily");
 
   const canContinue = goal.trim().length > 1 && action.trim().length > 1;
 
@@ -48,6 +49,17 @@ export default function OnboardingScreen() {
       </View>
 
       <View style={styles.field}>
+        <Text style={styles.label}>WHEN SHOULD THIS HAPPEN?</Text>
+        <View style={styles.cadenceRow}>
+          {(["daily", "weekdays", "weekly"] as Cadence[]).map((item) => (
+            <Pressable key={item} accessibilityRole="radio" accessibilityState={{ selected: cadence === item }} onPress={() => setCadence(item)} style={[styles.cadence, cadence === item && styles.cadenceSelected]}>
+              <Text style={[styles.cadenceText, cadence === item && styles.cadenceTextSelected]}>{item === "daily" ? "Every day" : item === "weekdays" ? "Weekdays" : "Weekly"}</Text>
+            </Pressable>
+          ))}
+        </View>
+      </View>
+
+      <View style={styles.field}>
         <Text style={styles.label}>MINUTES</Text>
         <TextInput
           value={duration}
@@ -78,5 +90,6 @@ const styles = StyleSheet.create({
   button: { marginTop: spacing.md, backgroundColor: colors.ink, borderRadius: radii.md, padding: 16, alignItems: "center" },
   buttonDisabled: { opacity: 0.35 },
   buttonText: { color: colors.paper, fontWeight: "800", fontSize: 16 },
+  cadenceRow:{flexDirection:"row",gap:8},cadence:{flex:1,borderWidth:1,borderColor:colors.line,borderRadius:radii.md,paddingVertical:12,alignItems:"center",backgroundColor:colors.surface},cadenceSelected:{backgroundColor:colors.accent,borderColor:colors.accent},cadenceText:{fontSize:13,fontWeight:"700",color:colors.text},cadenceTextSelected:{fontWeight:"800"},
   footer: { ...typography.small, color: colors.muted, textAlign: "center", marginTop: "auto", paddingBottom: spacing.md }
 });
