@@ -61,7 +61,7 @@ const STORAGE_KEY = "wildday.state.v4";
 
 const initialState: StoredState = {
   version: 4, onboarded: false, goalName: "", goals: [], actions: [],
-  focusMinutes: 0, focusHistory: {}, focusSessions: 0, reflection: "", reflectionDate: ""
+  focusMinutes: 0, focusHistory: {}, focusSessions: 0, reflection: "", reflectionDate: "", reminderEnabled: false, reminderHour: 9, reminderMinute: 0
 };
 
 export function getLocalDayKey(date = new Date()) {
@@ -240,7 +240,7 @@ export function WilddayProvider({ children }: { children: ReactNode }) {
         const action = current.actions.find((item) => item.id === actionId);
         const amount = Math.min(180, Math.max(0, Math.round(minutes ?? action?.duration ?? 0)));
         if (!amount) return current;
-        return { ...current, focusMinutes: current.focusMinutes + amount, focusSessions: current.focusSessions + 1 };
+        return { ...current, focusMinutes: current.focusMinutes + amount, focusHistory: { ...current.focusHistory, [todayKey]: (current.focusHistory[todayKey] ?? 0) + amount }, focusSessions: current.focusSessions + 1 };
       }),
 
       saveReflection: (text) => setState((current) => ({
