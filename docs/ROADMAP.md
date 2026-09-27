@@ -13,6 +13,10 @@ Implemented in the foundation branch:
 - [x] Reflection surface
 - [x] Initial visual language
 - [x] TypeScript CI check
+- [x] Date-aware recurring action history
+- [x] User-visible cadence controls
+- [x] Opt-in local daily reminders
+- [x] Expo SDK dependency alignment
 
 Next build pass:
 
