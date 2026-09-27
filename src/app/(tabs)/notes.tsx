@@ -49,15 +49,18 @@ export default function NotesScreen() {
 
         <View style={styles.section}>
           <Text style={styles.sectionTitle}>MENTAL NOTES</Text>
-          {shareMessage ? <Text style={styles.empty}>{shareMessage}</Text> : null}{notes.length === 0 ? <Text style={styles.empty}>Nothing floating around. Good.</Text> : null}{notes.length > 0 ? notes.map((note) => (
+          {shareMessage ? <Text style={styles.empty}>{shareMessage}</Text> : null}
+          {notes.length === 0 ? <Text style={styles.empty}>Nothing floating around. Good.</Text> : null}
+          {notes.length > 0 ? notes.map((note) => (
             <View key={note.id} style={styles.note}>
               <Pressable accessibilityRole="checkbox" accessibilityState={{ checked: note.completed }} onPress={() => toggleNote(note.id)} style={[styles.check, note.completed && styles.checkDone]}>
                 <Text style={styles.checkText}>{note.completed ? "✓" : ""}</Text>
               </Pressable>
               <Pressable style={styles.noteBody} onLongPress={() => Alert.alert("Note actions", "Choose what you want to do.", [{ text: "Cancel", style: "cancel" }, { text: "Share", onPress: () => shareNote(note.text) }, { text: "Delete", style: "destructive", onPress: () => deleteNote(note.id) }])} onPress={() => shareNote(note.text)}>
                 <Text style={[styles.noteText, note.completed && styles.done]}>{note.text}</Text>
-              </Pressable>            </View>
-          ))}
+              </Pressable>
+            </View>
+          )) : null}
         </View>
       </ScrollView>
     </KeyboardAvoidingView>
