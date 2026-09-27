@@ -1,11 +1,11 @@
 import { useMemo } from "react";
 import { Pressable, ScrollView, StyleSheet, Text, View } from "react-native";
-import { useWildday } from "@/state/WilddayContext";
+import { getLocalDayKey, useWildday } from "@/state/WilddayContext";
 import { colors, radii, spacing, typography } from "@/theme";
 
 export default function TodayScreen() {
   const { dueActions, completeAction, rescheduleAction, completedToday, deferredToday } = useWildday();
-  const todayKey = new Date().toLocaleDateString("en-CA");
+  const todayKey = getLocalDayKey();
   const next = useMemo(() => dueActions.find((item) => !item.history[todayKey]), [dueActions, todayKey]);
   const completed = completedToday;
   const deferred = deferredToday;
