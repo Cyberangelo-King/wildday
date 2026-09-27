@@ -4,14 +4,13 @@ import { useWildday } from "@/state/WilddayContext";
 import { colors, radii, spacing, typography } from "@/theme";
 
 export default function GoalsScreen() {
-  const { goals, addGoal, addAction } = useWildday();
+  const { goals, addGoalWithAction } = useWildday();
   const [goal, setGoal] = useState("");
   const [action, setAction] = useState("");
 
   function create() {
     if (!goal.trim() || !action.trim()) return;
-    const goalId = addGoal(goal.trim());
-    addAction({ goalId, title: action.trim(), duration: 20 });
+    addGoalWithAction(goal.trim(), action.trim(), 20);
     setGoal("");
     setAction("");
   }
