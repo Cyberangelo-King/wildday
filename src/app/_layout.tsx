@@ -1,5 +1,6 @@
 import { Redirect, Stack } from "expo-router";
 import { StatusBar } from "expo-status-bar";
+import { SafeAreaProvider } from "react-native-safe-area-context";
 import { useWildday } from "@/state/WilddayContext";
 
 function NavigationGate() {
@@ -10,9 +11,9 @@ function NavigationGate() {
 
 export default function RootLayout() {
   return (
-    <>
+    <SafeAreaProvider>
       <StatusBar style="auto" />
       <NavigationGate />
-    </>
+    </SafeAreaProvider>
   );
 }
