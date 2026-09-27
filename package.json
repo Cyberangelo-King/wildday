@@ -8,7 +8,9 @@
     "android": "expo start --android",
     "ios": "expo start --ios",
     "web": "expo start --web",
-    "typecheck": "tsc --noEmit"
+    "typecheck": "tsc --noEmit",
+    "doctor": "expo-doctor",
+    "validate": "npm run typecheck && npm run doctor && npx expo config --type public"
   },
   "dependencies": {
     "@react-native-async-storage/async-storage": "^2.2.0",
