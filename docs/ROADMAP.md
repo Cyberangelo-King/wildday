@@ -51,3 +51,16 @@ This roadmap is ordered around learning: validate the central behavior before ad
 
 Explore optional accountability partners, shared challenges, broader integrations, richer soundscapes, and additional personal systems only when user feedback shows a clear need.
 
+## Current build — 2026-09-28
+
+The first mobile foundation is now underway on `build/mobile-foundation`:
+
+- Expo + React Native + TypeScript scaffold
+- Expo Router navigation
+- First-day onboarding
+- Local-first action persistence
+- Today view with a single next move
+- Complete and reschedule interactions
+- Theme tokens isolated from product state
+
+The next implementation step is to expand the core loop into goals, repeatable actions, focus sessions, and weekly reflection after the visual direction is settled.
