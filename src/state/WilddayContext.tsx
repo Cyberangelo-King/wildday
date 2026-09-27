@@ -29,6 +29,7 @@ type StoredState = {
   goals: Goal[];
   actions: Action[];
   focusMinutes: number;
+  focusHistory: Record<string, number>;
   focusSessions: number;
   reflection: string;
   reflectionDate: string;
@@ -43,6 +44,8 @@ type WilddayContextValue = StoredState & {
   nextAction?: Action;
   completedToday: number;
   deferredToday: number;
+  weekCompleted: number;
+  weekFocusMinutes: number;
   dueActions: Action[];
   finishOnboarding: (goalName: string, actionTitle: string, duration: number, cadence?: Cadence) => void;
   addGoalWithAction: (goalName: string, title: string, duration: number, cadence?: Cadence) => void;
@@ -58,7 +61,7 @@ const STORAGE_KEY = "wildday.state.v4";
 
 const initialState: StoredState = {
   version: 4, onboarded: false, goalName: "", goals: [], actions: [],
-  focusMinutes: 0, focusSessions: 0, reflection: "", reflectionDate: ""
+  focusMinutes: 0, focusHistory: {}, focusSessions: 0, reflection: "", reflectionDate: ""
 };
 
 export function getLocalDayKey(date = new Date()) {
@@ -131,6 +134,7 @@ function migrate(raw: unknown): StoredState {
     goals,
     actions,
     focusMinutes: Math.max(0, Number(source.focusMinutes) || 0),
+    focusHistory: source.focusHistory && typeof source.focusHistory === "object" ? source.focusHistory as Record<string, number> : {},
     focusSessions: Math.max(0, Number(source.focusSessions) || 0),
     reflection: typeof source.reflection === "string" ? source.reflection.slice(0, 5000) : "",
     reflectionDate: typeof source.reflectionDate === "string" ? source.reflectionDate : "",
@@ -163,9 +167,16 @@ export function WilddayProvider({ children }: { children: ReactNode }) {
     const completedToday = dueActions.filter((action) => action.history[todayKey] === "completed").length;
     const deferredToday = dueActions.filter((action) => action.history[todayKey] === "deferred").length;
     const nextAction = dueActions.find((action) => !action.history[todayKey]);
+    const weekKeys = Array.from({ length: 7 }, (_, index) => {
+      const date = new Date();
+      date.setDate(date.getDate() - index);
+      return getLocalDayKey(date);
+    });
+    const weekCompleted = state.actions.reduce((sum, action) => sum + weekKeys.filter((key) => action.history[key] === "completed").length, 0);
+    const weekFocusMinutes = weekKeys.reduce((sum, key) => sum + (state.focusHistory[key] ?? 0), 0);
 
     return {
-      ...state, ready, todayKey, dueActions, nextAction, completedToday, deferredToday,
+      ...state, ready, todayKey, dueActions, nextAction, completedToday, deferredToday, weekCompleted, weekFocusMinutes,
 
       finishOnboarding: (goalName, actionTitle, duration, cadence = "daily") => {
         const goalId = String(Date.now());
