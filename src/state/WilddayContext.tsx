@@ -61,6 +61,8 @@ type WilddayContextValue = StoredState & {
   toggleNote: (id: string) => void;
   deleteNote: (id: string) => void;
   saveReminderSettings: (enabled: boolean, hour: number, minute: number) => void;
+  storageError: string | null;
+  retryPersistence: () => Promise<void>;
 };
 
 const STORAGE_KEY = "wildday.state.v5";
@@ -157,6 +159,7 @@ const WilddayContext = createContext<WilddayContextValue | null>(null);
 export function WilddayProvider({ children }: { children: ReactNode }) {
   const [state, setState] = useState<StoredState>(initialState);
   const [ready, setReady] = useState(false);
+  const [storageError, setStorageError] = useState<string | null>(null);
   const todayKey = getLocalDayKey();
 
   useEffect(() => {
@@ -167,12 +170,13 @@ export function WilddayProvider({ children }: { children: ReactNode }) {
         if (legacy) return setState(migrate(JSON.parse(legacy)));
         setState(initialState);
       })
-      .catch(() => setState(initialState))
+      .catch(() => { setState(initialState); setStorageError("Your saved Wildday data could not be opened."); })
       .finally(() => setReady(true));
   }, []);
 
   useEffect(() => {
-    if (ready) AsyncStorage.setItem(STORAGE_KEY, JSON.stringify(state)).catch(() => {});
+    if (!ready) return;
+    AsyncStorage.setItem(STORAGE_KEY, JSON.stringify(state)).then(() => setStorageError(null)).catch(() => setStorageError("Wildday could not save your latest change."));
   }, [state, ready]);
 
   const value = useMemo<WilddayContextValue>(() => {
@@ -189,7 +193,9 @@ export function WilddayProvider({ children }: { children: ReactNode }) {
     const weekFocusMinutes = weekKeys.reduce((sum, key) => sum + (state.focusHistory[key] ?? 0), 0);
 
     return {
-      ...state, ready, todayKey, dueActions, nextAction, completedToday, deferredToday, weekCompleted, weekFocusMinutes,
+      ...state, ready, storageError, retryPersistence: async () => {
+        try { await AsyncStorage.setItem(STORAGE_KEY, JSON.stringify(state)); setStorageError(null); } catch { setStorageError("Wildday still cannot save on this device."); }
+      }, todayKey, dueActions, nextAction, completedToday, deferredToday, weekCompleted, weekFocusMinutes,
 
       finishOnboarding: (goalName, actionTitle, duration, cadence = "daily") => {
         const goalId = String(Date.now());
@@ -277,7 +283,7 @@ export function WilddayProvider({ children }: { children: ReactNode }) {
         reminderMinute: Math.min(59, Math.max(0, Math.round(minute)))
       }))
     };
-  }, [ready, state, todayKey]);
+  }, [ready, state, todayKey, storageError]);
 
   return <WilddayContext.Provider value={value}>{children}</WilddayContext.Provider>;
 }
