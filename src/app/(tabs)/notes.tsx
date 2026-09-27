@@ -2,15 +2,22 @@ import { useState } from "react";
 import { Alert, KeyboardAvoidingView, Platform, Pressable, ScrollView, StyleSheet, Text, TextInput, View } from "react-native";
 import { useWildday } from "@/state/WilddayContext";
 import { colors, radii, spacing, typography } from "@/theme";
+import { shareWildday } from "@/services/share";
 
 export default function NotesScreen() {
   const { notes, addNote, toggleNote, deleteNote } = useWildday();
   const [text, setText] = useState("");
+  const [shareMessage, setShareMessage] = useState("");
 
   function save() {
     if (!text.trim()) return;
     addNote(text);
     setText("");
+  }
+
+  async function shareNote(noteText: string) {
+    const result = await shareWildday({ title: "A Wildday note", message: noteText.slice(0, 1500) });
+    setShareMessage(result.ok ? "Ready to share." : "Sharing was cancelled or unavailable.");
   }
 
   return (
@@ -42,12 +49,12 @@ export default function NotesScreen() {
 
         <View style={styles.section}>
           <Text style={styles.sectionTitle}>MENTAL NOTES</Text>
-          {notes.length === 0 ? <Text style={styles.empty}>Nothing floating around. Good.</Text> : notes.map((note) => (
+          {shareMessage ? <Text style={styles.empty}>{shareMessage}</Text> : null}{notes.length === 0 ? <Text style={styles.empty}>Nothing floating around. Good.</Text> : null}{notes.length > 0 ? notes.map((note) => (
             <View key={note.id} style={styles.note}>
               <Pressable accessibilityRole="checkbox" accessibilityState={{ checked: note.completed }} onPress={() => toggleNote(note.id)} style={[styles.check, note.completed && styles.checkDone]}>
                 <Text style={styles.checkText}>{note.completed ? "✓" : ""}</Text>
               </Pressable>
-              <Pressable style={styles.noteBody} onLongPress={() => Alert.alert("Delete note?", "This cannot be undone.", [{ text: "Cancel", style: "cancel" }, { text: "Delete", style: "destructive", onPress: () => deleteNote(note.id) }])}>
+              <Pressable style={styles.noteBody} onLongPress={() => Alert.alert("Note actions", "Choose what you want to do.", [{ text: "Cancel", style: "cancel" }, { text: "Share", onPress: () => shareNote(note.text) }, { text: "Delete", style: "destructive", onPress: () => deleteNote(note.id) }])} onPress={() => shareNote(note.text)}><Text style={[styles.noteText, note.completed && styles.done]}>{note.text}</Text></Pressable>{false && <Pressable style={styles.noteBody} onLongPress={() => Alert.alert("Delete note?", "This cannot be undone.", [{ text: "Cancel", style: "cancel" }, { text: "Delete", style: "destructive", onPress: () => deleteNote(note.id) }])}>
                 <Text style={[styles.noteText, note.completed && styles.done]}>{note.text}</Text>
               </Pressable>
             </View>
