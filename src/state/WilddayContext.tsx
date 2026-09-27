@@ -22,6 +22,8 @@ export type Goal = {
   actions: number;
 };
 
+export type Note = { id: string; text: string; createdAt: string; completed: boolean };
+
 type StoredState = {
   version: 5;
   onboarded: boolean;
@@ -33,6 +35,7 @@ type StoredState = {
   focusSessions: number;
   reflection: string;
   reflectionDate: string;
+  notes: Note[];
   reminderEnabled: boolean;
   reminderHour: number;
   reminderMinute: number;
@@ -54,6 +57,9 @@ type WilddayContextValue = StoredState & {
   rescheduleAction: (id: string) => void;
   recordFocus: (actionId?: string, minutes?: number) => void;
   saveReflection: (text: string) => void;
+  addNote: (text: string) => void;
+  toggleNote: (id: string) => void;
+  deleteNote: (id: string) => void;
   saveReminderSettings: (enabled: boolean, hour: number, minute: number) => void;
 };
 
@@ -139,6 +145,7 @@ function migrate(raw: unknown): StoredState {
     focusSessions: Math.max(0, Number(source.focusSessions) || 0),
     reflection: typeof source.reflection === "string" ? source.reflection.slice(0, 5000) : "",
     reflectionDate: typeof source.reflectionDate === "string" ? source.reflectionDate : "",
+    notes: Array.isArray(source.notes) ? source.notes.filter((item): item is Note => !!item && typeof item === "object" && typeof (item as Note).id === "string" && typeof (item as Note).text === "string").map((item) => ({ id: item.id, text: item.text.trim().slice(0, 500), createdAt: item.createdAt, completed: Boolean(item.completed) })).slice(0, 100) : [],
     reminderEnabled: Boolean(source.reminderEnabled),
     reminderHour: Math.min(23, Math.max(0, Number(source.reminderHour) || 9)),
     reminderMinute: Math.min(59, Math.max(0, Number(source.reminderMinute) || 0))
@@ -252,6 +259,16 @@ export function WilddayProvider({ children }: { children: ReactNode }) {
       saveReflection: (text) => setState((current) => ({
         ...current, reflection: text.trim().slice(0, 5000), reflectionDate: new Date().toISOString()
       })),
+
+      addNote: (text) => setState((current) => {
+        const clean = text.trim().slice(0, 500);
+        if (!clean) return current;
+        return { ...current, notes: [{ id: `${Date.now()}-${Math.random().toString(36).slice(2, 8)}`, text: clean, createdAt: new Date().toISOString(), completed: false }, ...current.notes].slice(0, 100) };
+      }),
+
+      toggleNote: (id) => setState((current) => ({ ...current, notes: current.notes.map((note) => note.id === id ? { ...note, completed: !note.completed } : note) })),
+
+      deleteNote: (id) => setState((current) => ({ ...current, notes: current.notes.filter((note) => note.id !== id) })),
 
       saveReminderSettings: (enabled, hour, minute) => setState((current) => ({
         ...current,
