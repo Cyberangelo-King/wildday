@@ -6,7 +6,6 @@
     "orientation": "portrait",
     "scheme": "wildday",
     "userInterfaceStyle": "automatic",
-    "newArchEnabled": true,
     "experiments": {
       "typedRoutes": true
     },
