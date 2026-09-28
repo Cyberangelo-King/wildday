@@ -27,4 +27,8 @@ Start with a today view, a small set of goals and repeatable actions, a focus ti
 
 ## Status
 
-This repository is at product-foundation stage. The next milestone is choosing a visual direction and translating the brief into the first mobile experience.
+The repository now contains the first resilient mobile foundation: Expo + React Native + TypeScript, file-based routing, versioned local persistence, date-aware recurring actions, focus cycles, reflections, and opt-in local reminders.
+
+The visual system is intentionally restrained: warm paper, deep ink, an acid-lime action signal, oversized type, generous spacing, and low visual noise. Theme tokens remain isolated so the interface can evolve without rewriting product logic.
+
+The branch is still pre-release. TypeScript CI, real-device validation, accessibility review, persistence recovery, and notification behaviour are release gates.
