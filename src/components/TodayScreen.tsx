@@ -1,14 +1,23 @@
-import { useMemo } from "react";
-import { Pressable, ScrollView, StyleSheet, Text, View } from "react-native";
+import { useMemo, useState } from "react";
+import { Pressable, ScrollView, StyleSheet, Text, TextInput, View } from "react-native";
 import { getLocalDayKey, useWildday } from "@/state/WilddayContext";
 import { colors, radii, spacing, typography } from "@/theme";
 
 export default function TodayScreen() {
-  const { dueActions, completeAction, rescheduleAction, completedToday, deferredToday } = useWildday();
+  const { dueActions, completeAction, rescheduleAction, completedToday, deferredToday, addNote } = useWildday();
+  const [capture, setCapture] = useState("");
+  const [captureMessage, setCaptureMessage] = useState("");
   const todayKey = getLocalDayKey();
   const next = useMemo(() => dueActions.find((item) => !item.history[todayKey]), [dueActions, todayKey]);
   const completed = completedToday;
   const deferred = deferredToday;
+  function quickCapture() {
+    const clean = capture.trim();
+    if (!clean) return;
+    addNote(clean);
+    setCapture("");
+    setCaptureMessage("Saved to Notes.");
+  }
 
   return (
     <ScrollView contentContainerStyle={styles.content}>
@@ -42,6 +51,13 @@ export default function TodayScreen() {
         </View>
       ))}
 
+      <View style={styles.captureCard}>
+        <Text style={styles.captureEyebrow}>QUICK CAPTURE</Text>
+        <Text style={styles.captureTitle}>Get it out. Keep moving.</Text>
+        <TextInput accessibilityLabel="Quick mental note" value={capture} onChangeText={(value) => { setCapture(value); setCaptureMessage(""); }} placeholder="Remember to…" placeholderTextColor={colors.muted} maxLength={500} style={styles.captureInput} />
+        <View style={styles.captureFooter}><Text style={styles.captureMeta}>{captureMessage || `${capture.length}/500`}</Text><Pressable accessibilityRole="button" disabled={!capture.trim()} onPress={quickCapture} style={[styles.captureButton, !capture.trim() && styles.disabled]}><Text style={styles.captureButtonText}>Capture</Text></Pressable></View>
+      </View>
+
       <View style={styles.note}>
         <Text style={styles.noteTitle}>No punishment loop.</Text>
         <Text style={styles.noteBody}>Missing a move changes the plan. It does not change your worth.</Text>
@@ -61,5 +77,5 @@ const styles=StyleSheet.create({
  card:{flexDirection:"row",alignItems:"center",gap:spacing.md,backgroundColor:colors.surface,borderRadius:radii.lg,padding:spacing.md,borderWidth:1,borderColor:colors.line},quietCard:{opacity:.55},
  check:{width:28,height:28,borderRadius:14,borderWidth:1.5,borderColor:colors.line,alignItems:"center",justifyContent:"center"},checkDone:{backgroundColor:colors.accent,borderColor:colors.accent},checkText:{color:colors.ink,fontWeight:"900"},
  cardCopy:{flex:1},cardTitle:{...typography.body,color:colors.text,fontWeight:"700"},completedText:{textDecorationLine:"line-through"},cardMeta:{...typography.small,color:colors.muted,marginTop:3},later:{...typography.eyebrow,color:colors.muted},
- note:{padding:spacing.md,marginTop:spacing.sm},noteTitle:{...typography.body,color:colors.text,fontWeight:"700"},noteBody:{...typography.small,color:colors.muted,marginTop:4,lineHeight:19}
+ captureCard:{backgroundColor:colors.surface,borderWidth:1,borderColor:colors.line,borderRadius:radii.lg,padding:spacing.md,marginTop:spacing.md},captureEyebrow:{...typography.eyebrow,color:colors.muted},captureTitle:{...typography.body,color:colors.text,fontWeight:"800",marginTop:5},captureInput:{minHeight:52,color:colors.text,fontSize:16,paddingVertical:8},captureFooter:{flexDirection:"row",alignItems:"center",justifyContent:"space-between"},captureMeta:{...typography.small,color:colors.muted},captureButton:{backgroundColor:colors.ink,borderRadius:radii.md,paddingHorizontal:16,paddingVertical:10},captureButtonText:{color:colors.paper,fontWeight:"800"},disabled:{opacity:.35},note:{padding:spacing.md,marginTop:spacing.sm},noteTitle:{...typography.body,color:colors.text,fontWeight:"700"},noteBody:{...typography.small,color:colors.muted,marginTop:4,lineHeight:19}
 });
