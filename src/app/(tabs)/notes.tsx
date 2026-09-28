@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Alert, KeyboardAvoidingView, Platform, Pressable, ScrollView, StyleSheet, Text, TextInput, View } from "react-native";
+import { Alert, KeyboardAvoidingView, Modal, Platform, Pressable, ScrollView, StyleSheet, Text, TextInput, View } from "react-native";
 import { useWildday } from "@/state/WilddayContext";
 import { colors, radii, spacing, typography } from "@/theme";
 import { shareWildday } from "@/services/share";
@@ -9,6 +9,7 @@ export default function NotesScreen() {
   const [text, setText] = useState("");
   const [shareMessage, setShareMessage] = useState("");
   const [deletedNote, setDeletedNote] = useState<ReturnType<typeof useWildday>["notes"][number] | null>(null);
+  const [actionNoteId, setActionNoteId] = useState<string | null>(null);
 
   function save() {
     if (!text.trim()) return;
@@ -28,19 +29,7 @@ export default function NotesScreen() {
     ];
 
     if (goals.length > 0) {
-      buttons.push({
-        text: "Turn into action",
-        onPress: () => {
-          const goalButtons = goals.slice(0, 4).map((goal) => ({
-            text: goal.name,
-            onPress: () => {
-              promoteNoteToAction(noteId, goal.id, 20);
-              setShareMessage("Moved to your actions.");
-            }
-          }));
-          Alert.alert("Make it actionable", "Which goal should carry this?", [...goalButtons, { text: "Cancel", style: "cancel" }]);
-        }
-      });
+      buttons.push({ text: "Turn into action", onPress: () => setActionNoteId(noteId) });
     }
 
     buttons.push({ text: "Delete", style: "destructive", onPress: () => { const note = notes.find((item) => item.id === noteId); if (!note) return; deleteNote(noteId); setDeletedNote(note); setShareMessage("Note deleted."); } });
@@ -103,6 +92,18 @@ export default function NotesScreen() {
           )) : null}
         </View>
       </ScrollView>
+      <Modal visible={actionNoteId !== null} transparent animationType="fade" onRequestClose={() => setActionNoteId(null)}>
+        <View style={styles.modalBackdrop}>
+          <View style={styles.goalPicker}>
+            <Text style={styles.pickerTitle}>Make it actionable</Text>
+            <Text style={styles.pickerBody}>Choose the goal that should carry this note.</Text>
+            <ScrollView style={styles.goalList} contentContainerStyle={styles.goalListContent}>
+              {goals.map((goal) => <Pressable key={goal.id} accessibilityRole="button" onPress={() => { if (!actionNoteId) return; promoteNoteToAction(actionNoteId, goal.id, 20); setActionNoteId(null); setShareMessage("Moved to your actions."); }} style={styles.goalChoice}><Text style={styles.goalChoiceText}>{goal.name}</Text><Text style={styles.goalChoiceMeta}>{goal.actions} {goal.actions === 1 ? "move" : "moves"}</Text></Pressable>)}
+            </ScrollView>
+            <Pressable accessibilityRole="button" onPress={() => setActionNoteId(null)} style={styles.cancelButton}><Text style={styles.cancelText}>Cancel</Text></Pressable>
+          </View>
+        </View>
+      </Modal>
     </KeyboardAvoidingView>
   );
 }
@@ -125,6 +126,17 @@ const styles = StyleSheet.create({
   feedback: { ...typography.small, color: colors.text, marginTop: spacing.md },
   undo: { alignSelf: "flex-start", marginTop: 8, borderWidth: 1, borderColor: colors.ink, borderRadius: radii.md, paddingHorizontal: 12, paddingVertical: 8 },
   undoText: { ...typography.small, color: colors.text, fontWeight: "800" },
+  modalBackdrop: { flex: 1, backgroundColor: "rgba(0,0,0,0.45)", justifyContent: "flex-end" },
+  goalPicker: { backgroundColor: colors.paper, borderTopLeftRadius: radii.xl, borderTopRightRadius: radii.xl, padding: spacing.lg, maxHeight: "78%" },
+  pickerTitle: { ...typography.section, color: colors.text },
+  pickerBody: { ...typography.small, color: colors.muted, marginTop: 6 },
+  goalList: { marginTop: spacing.md },
+  goalListContent: { gap: 8, paddingBottom: 8 },
+  goalChoice: { backgroundColor: colors.surface, borderWidth: 1, borderColor: colors.line, borderRadius: radii.md, padding: spacing.md },
+  goalChoiceText: { ...typography.body, color: colors.text, fontWeight: "800" },
+  goalChoiceMeta: { ...typography.small, color: colors.muted, marginTop: 3 },
+  cancelButton: { borderRadius: radii.md, padding: 14, alignItems: "center", backgroundColor: colors.ink, marginTop: 8 },
+  cancelText: { color: colors.paper, fontWeight: "800" },
   empty: { ...typography.body, color: colors.muted, marginTop: spacing.md },
   note: { flexDirection: "row", alignItems: "flex-start", gap: 12, paddingVertical: 14, borderBottomWidth: 1, borderBottomColor: colors.line },
   check: { width: 26, height: 26, borderWidth: 1, borderColor: colors.ink, borderRadius: 13, alignItems: "center", justifyContent: "center", marginTop: 2 },
