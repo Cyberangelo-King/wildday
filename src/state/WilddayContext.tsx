@@ -56,6 +56,7 @@ type WilddayContextValue = StoredState & {
   addNote: (text: string) => void;
   toggleNote: (id: string) => void;
   deleteNote: (id: string) => void;
+  restoreNote: (note: Note) => void;
   saveReminderSettings: (enabled: boolean, hour: number, minute: number) => void;
   storageError: string | null;
   retryPersistence: () => Promise<void>;
@@ -320,6 +321,7 @@ export function WilddayProvider({ children }: { children: ReactNode }) {
 
       toggleNote: (id) => setState((current) => ({ ...current, notes: current.notes.map((note) => note.id === id ? { ...note, completed: !note.completed } : note) })),
       deleteNote: (id) => setState((current) => ({ ...current, notes: current.notes.filter((note) => note.id !== id) })),
+      restoreNote: (note) => setState((current) => current.notes.some((item) => item.id === note.id) ? current : { ...current, notes: [note, ...current.notes].slice(0, 100) }),
       saveReminderSettings: (enabled, hour, minute) => setState((current) => ({
         ...current,
         reminderEnabled: enabled,
