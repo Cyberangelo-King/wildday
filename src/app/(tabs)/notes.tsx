@@ -5,9 +5,10 @@ import { colors, radii, spacing, typography } from "@/theme";
 import { shareWildday } from "@/services/share";
 
 export default function NotesScreen() {
-  const { notes, goals, addNote, toggleNote, deleteNote, promoteNoteToAction } = useWildday();
+  const { notes, goals, addNote, toggleNote, deleteNote, restoreNote, promoteNoteToAction } = useWildday();
   const [text, setText] = useState("");
   const [shareMessage, setShareMessage] = useState("");
+  const [deletedNote, setDeletedNote] = useState<ReturnType<typeof useWildday>["notes"][number] | null>(null);
 
   function save() {
     if (!text.trim()) return;
@@ -42,7 +43,7 @@ export default function NotesScreen() {
       });
     }
 
-    buttons.push({ text: "Delete", style: "destructive", onPress: () => deleteNote(noteId) });
+    buttons.push({ text: "Delete", style: "destructive", onPress: () => { const note = notes.find((item) => item.id === noteId); if (!note) return; deleteNote(noteId); setDeletedNote(note); setShareMessage("Note deleted."); } });
     Alert.alert("Note actions", "Choose what you want to do.", buttons);
   }
 
@@ -76,6 +77,7 @@ export default function NotesScreen() {
         <View style={styles.section}>
           <Text style={styles.sectionTitle}>MENTAL NOTES</Text>
           {shareMessage ? <Text style={styles.feedback}>{shareMessage}</Text> : null}
+          {deletedNote ? <Pressable accessibilityRole="button" onPress={() => { restoreNote(deletedNote); setDeletedNote(null); setShareMessage("Note restored."); }} style={styles.undo}><Text style={styles.undoText}>Undo delete</Text></Pressable> : null}
           {notes.length === 0 ? <Text style={styles.empty}>Nothing floating around. Good.</Text> : null}
           {notes.length > 0 ? notes.map((note) => (
             <View key={note.id} style={styles.note}>
@@ -121,6 +123,8 @@ const styles = StyleSheet.create({
   section: { marginTop: spacing.xl },
   sectionTitle: { ...typography.eyebrow, color: colors.muted },
   feedback: { ...typography.small, color: colors.text, marginTop: spacing.md },
+  undo: { alignSelf: "flex-start", marginTop: 8, borderWidth: 1, borderColor: colors.ink, borderRadius: radii.md, paddingHorizontal: 12, paddingVertical: 8 },
+  undoText: { ...typography.small, color: colors.text, fontWeight: "800" },
   empty: { ...typography.body, color: colors.muted, marginTop: spacing.md },
   note: { flexDirection: "row", alignItems: "flex-start", gap: 12, paddingVertical: 14, borderBottomWidth: 1, borderBottomColor: colors.line },
   check: { width: 26, height: 26, borderWidth: 1, borderColor: colors.ink, borderRadius: 13, alignItems: "center", justifyContent: "center", marginTop: 2 },
