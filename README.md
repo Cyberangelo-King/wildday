@@ -32,3 +32,9 @@ The repository now contains the first resilient mobile foundation: Expo + React 
 The visual system is intentionally restrained: warm paper, deep ink, an acid-lime action signal, oversized type, generous spacing, and low visual noise. Theme tokens remain isolated so the interface can evolve without rewriting product logic.
 
 The branch is still pre-release. TypeScript CI, real-device validation, accessibility review, persistence recovery, and notification behaviour are release gates.
+
+## Builds
+
+EAS build profiles are configured in `eas.json` for development, preview, and production builds. The native iOS and Android identifiers are declared in `app.json`.
+
+Before the first cloud build, authenticate with EAS and run the standard Expo configuration checks. Native notification behavior and focus/background behavior still need validation on physical devices.
